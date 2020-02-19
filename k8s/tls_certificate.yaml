@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  # @custom: change to your domain name
+  name: myquasarapp.net
+  namespace: default
+spec:
+  # @custom: change to your domain name
+  secretName: tls-myquasarapp.net
+  issuerRef:
+    # @custom: provide the certificate issuer here
+    name: letsencrypt
+    kind: ClusterIssuer
+  dnsNames:
+  # @custom: change to your domain name
+  - myquasarapp.net

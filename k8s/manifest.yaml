@@ -1,0 +1,84 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: quasar-myquasarapp
+  namespace: default
+spec:
+  # tls:
+  # - hosts:
+  #   # @custom: change to your domain name
+  #   - myquasarapp.net
+  #   # @custom: change to your domain name
+  #   secretName: tls-myquasarapp.net
+  rules:
+  # @custom: change to your domain name
+  - host: myquasarapp.net
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: quasar-myquasarapp
+          servicePort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quasar-myquasarapp
+  labels:
+    app: quasar-myquasarapp
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+  selector:
+    app: quasar-myquasarapp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quasar-myquasarapp
+  labels:
+    app: quasar-myquasarapp
+spec:
+  selector:
+    matchLabels:
+      app: quasar-myquasarapp
+  # @custom: specify replicas
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: quasar-myquasarapp
+    spec:
+      nodeSelector:
+        # @custom: provide a node label if you wish to specify the nodes your
+        # quasar app would run on, for example:
+        # quasar_myquasarapp_pods_node: "true"
+      containers:
+      - name: quasar-myquasarapp
+        image: node:alpine
+        ports:
+        - containerPort: 3000
+        env:
+          - name: NODE_ENV
+            value: "production"
+          # @custom: supply app secrets
+          # - name: SECRET_1
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: quasar-myquasarapp
+          #       key: secret1
+          # - name: SECRET_2
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: quasar-myquasarapp
+          #       key: secret2
+        volumeMounts:
+        - name: quasar-myquasarapp
+          mountPath: /quasar
+        workingDir: /quasar/myquasarapp
+        command: ["yarn", "start"]
+      volumes:
+      - name: quasar-myquasarapp
+        persistentVolumeClaim:
+          claimName: quasar-myquasarapp
