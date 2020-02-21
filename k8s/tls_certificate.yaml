@@ -1,16 +1,15 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
-  # @custom: change to your domain name
-  name: myquasarapp.net
+  name: example.net
   namespace: default
 spec:
-  # @custom: change to your domain name
-  secretName: tls-myquasarapp.net
+  secretName: tls-example.net
   issuerRef:
     # @custom: provide the certificate issuer here
     name: letsencrypt
     kind: ClusterIssuer
   dnsNames:
-  # @custom: change to your domain name
-  - myquasarapp.net
+  - example.net
+  # if you wish to access the staging app from outside using https
+  # - stg.example.net

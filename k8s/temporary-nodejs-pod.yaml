@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: temporary-nodejs-pod
+spec:
+  containers:
+  - name: nodejs
+    # use the same image used in 'manifest-*.yaml'
+    image: node:12.16.1-alpine3.11
+    volumeMounts:
+    - name: quasar-myquasarapp
+      mountPath: /quasar
+      subPath: quasar
+    workingDir: /quasar
+    command: ["sleep", "infinity"]
+  volumes:
+  - name: quasar-myquasarapp
+    persistentVolumeClaim:
+      claimName: quasar-myquasarapp

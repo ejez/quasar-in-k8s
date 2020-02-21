@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: quasar-myquasarapp
+  namespace: default
+spec:
+  # tls:
+  # - hosts:
+  #   - example.net
+  #   # uncomment if you have included the staging dns name in the tls cert
+  #   # - stg.example.net
+  #   secretName: tls-example.net
+  rules:
+  - host: example.net
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: quasar-myquasarapp-blue
+          servicePort: 3000
+  - host: stg.example.net
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: quasar-myquasarapp-green
+          servicePort: 3000

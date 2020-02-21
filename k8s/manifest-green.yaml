@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quasar-myquasarapp-green
+  labels:
+    app: quasar-myquasarapp-green
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+  selector:
+    app: quasar-myquasarapp-green
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quasar-myquasarapp-green
+  labels:
+    app: quasar-myquasarapp-green
+spec:
+  selector:
+    matchLabels:
+      app: quasar-myquasarapp-green
+  # @custom: specify replicas
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: quasar-myquasarapp-green
+    spec:
+      # nodeSelector:
+        # @custom: provide a node label if you wish to specify the nodes your
+        # quasar app would run on, for example:
+        # quasar_myquasarapp_pods_node: "true"
+      containers:
+      - name: quasar-myquasarapp-green
+        # use fixed version of the image (instead of latest) to avoid the
+        # possibility of breaking the app when the image is updated
+        # https://hub.docker.com/_/node
+        image: node:12.16.1-alpine3.11
+        ports:
+        - containerPort: 3000
+        env:
+          - name: NODE_ENV
+            value: "production"
+          # @custom: supply app secrets
+          # - name: SECRET_1
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: quasar-myquasarapp
+          #       key: secret1
+          # - name: SECRET_2
+          #   valueFrom:
+          #     secretKeyRef:
+          #       name: quasar-myquasarapp
+          #       key: secret2
+        volumeMounts:
+        - name: quasar-myquasarapp
+          mountPath: /quasar/myquasarapp-green
+          subPath: quasar/myquasarapp-green
+        workingDir: /quasar/myquasarapp-green
+        command: ["yarn", "start"]
+      volumes:
+      - name: quasar-myquasarapp
+        persistentVolumeClaim:
+          claimName: quasar-myquasarapp

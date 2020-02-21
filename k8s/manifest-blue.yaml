@@ -1,62 +1,43 @@
-apiVersion: networking.k8s.io/v1beta1
-kind: Ingress
-metadata:
-  name: quasar-myquasarapp
-  namespace: default
-spec:
-  # tls:
-  # - hosts:
-  #   # @custom: change to your domain name
-  #   - myquasarapp.net
-  #   # @custom: change to your domain name
-  #   secretName: tls-myquasarapp.net
-  rules:
-  # @custom: change to your domain name
-  - host: myquasarapp.net
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: quasar-myquasarapp
-          servicePort: 3000
----
 apiVersion: v1
 kind: Service
 metadata:
-  name: quasar-myquasarapp
+  name: quasar-myquasarapp-blue
   labels:
-    app: quasar-myquasarapp
+    app: quasar-myquasarapp-blue
 spec:
   ports:
   - port: 3000
     targetPort: 3000
   selector:
-    app: quasar-myquasarapp
+    app: quasar-myquasarapp-blue
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: quasar-myquasarapp
+  name: quasar-myquasarapp-blue
   labels:
-    app: quasar-myquasarapp
+    app: quasar-myquasarapp-blue
 spec:
   selector:
     matchLabels:
-      app: quasar-myquasarapp
+      app: quasar-myquasarapp-blue
   # @custom: specify replicas
   replicas: 1
   template:
     metadata:
       labels:
-        app: quasar-myquasarapp
+        app: quasar-myquasarapp-blue
     spec:
-      nodeSelector:
+      # nodeSelector:
         # @custom: provide a node label if you wish to specify the nodes your
         # quasar app would run on, for example:
         # quasar_myquasarapp_pods_node: "true"
       containers:
-      - name: quasar-myquasarapp
-        image: node:alpine
+      - name: quasar-myquasarapp-blue
+        # use fixed version of the image (instead of latest) to avoid the
+        # possibility of breaking the app when the image is updated
+        # https://hub.docker.com/_/node
+        image: node:12.16.1-alpine3.11
         ports:
         - containerPort: 3000
         env:
@@ -75,8 +56,9 @@ spec:
           #       key: secret2
         volumeMounts:
         - name: quasar-myquasarapp
-          mountPath: /quasar
-        workingDir: /quasar/myquasarapp
+          mountPath: /quasar/myquasarapp-blue
+          subPath: quasar/myquasarapp-blue
+        workingDir: /quasar/myquasarapp-blue
         command: ["yarn", "start"]
       volumes:
       - name: quasar-myquasarapp
